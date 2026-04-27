@@ -6,10 +6,13 @@
   "author": "",
   "type": "module",
   "main": "index.js",
- "scripts": {
-  "start": "node src/server.js",
-  "dev": "node --env-file=.env --watch src/server.js"
-},
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --env-file=.env --watch src/server.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
     "eslint": "^9.29.0",
@@ -19,13 +22,13 @@
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
-    "@prisma/client": "^7.8.0",
+    "@prisma/client": "^6.19.3",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.20.0",
-    "prisma": "^7.8.0",
+    "prisma": "^6.19.3",
     "swagger-ui-express": "^5.0.1",
     "yamljs": "^0.3.0"
   }
