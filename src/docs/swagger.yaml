@@ -6,7 +6,7 @@ info:
   description: Full CRUD API with JWT authentication (Trips, Destinations, Activities)
 
 servers:
-  - url: http://localhost:3000
+  - url: https://travel-planner-api-1pcn.onrender.com
 
 components:
   securitySchemes:
