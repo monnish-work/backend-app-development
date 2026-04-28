@@ -143,7 +143,9 @@ export const deleteActivity = async (id, userId) => {
     throw new AppError("Forbidden", 403);
   }
 
-  return prisma.activity.delete({
+  await prisma.activity.delete({
     where: { id: parseInt(id) },
   });
+
+  // ❌ no return
 };

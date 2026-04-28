@@ -104,7 +104,9 @@ export const deleteDestination = async (id, userId) => {
     throw new AppError("Forbidden", 403);
   }
 
-  return prisma.destination.delete({
+  await prisma.destination.delete({
     where: { id: parseInt(id) },
   });
+
+  // ❌ DO NOT return anything
 };

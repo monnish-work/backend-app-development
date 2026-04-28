@@ -15,77 +15,53 @@ components:
       scheme: bearer
       bearerFormat: JWT
 
+security:
+  - bearerAuth: []
+
+# ================= SCHEMAS =================
+components:
   schemas:
     User:
       type: object
       properties:
-        id:
-          type: integer
-        name:
-          type: string
-        email:
-          type: string
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string }
 
     Trip:
       type: object
       properties:
-        id:
-          type: integer
-        title:
-          type: string
-        startDate:
-          type: string
-          format: date
-        endDate:
-          type: string
-          format: date
-        budget:
-          type: number
-        userId:
-          type: integer
+        id: { type: integer }
+        title: { type: string }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date }
+        budget: { type: number }
+        userId: { type: integer }
 
     Destination:
       type: object
       properties:
-        id:
-          type: integer
-        city:
-          type: string
-        country:
-          type: string
-        visitDate:
-          type: string
-          format: date
-        notes:
-          type: string
-        tripId:
-          type: integer
+        id: { type: integer }
+        city: { type: string }
+        country: { type: string }
+        visitDate: { type: string, format: date }
+        notes: { type: string }
+        tripId: { type: integer }
 
     Activity:
       type: object
       properties:
-        id:
-          type: integer
-        name:
-          type: string
-        description:
-          type: string
-        activityDate:
-          type: string
-          format: date
-        activityTime:
-          type: string
-        estimatedCost:
-          type: number
-        destinationId:
-          type: integer
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        activityDate: { type: string, format: date }
+        activityTime: { type: string }
+        estimatedCost: { type: number }
+        destinationId: { type: integer }
 
-security:
-  - bearerAuth: []
+# ================= AUTH =================
 
 paths:
-
-  # ================= AUTH =================
 
   /api/auth/signup:
     post:
@@ -95,26 +71,25 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              required: [name, email, password]
-              properties:
-                name:
-                  type: string
-                  example: User1
-                email:
-                  type: string
-                  example: user@test.com
-                password:
-                  type: string
-                  example: Password123
+            example:
+              name: Alice
+              email: alice@test.com
+              password: Password123
       responses:
         "201":
-          description: User created successfully
+          description: User created
         "400":
-          description: Validation error
+          description: Bad Request
+          content:
+            application/json:
+              example:
+                message: Invalid input
         "409":
-          description: User already exists
+          description: Conflict
+          content:
+            application/json:
+              example:
+                message: User already exists
 
   /api/auth/login:
     post:
@@ -124,21 +99,23 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              required: [email, password]
-              properties:
-                email:
-                  type: string
-                password:
-                  type: string
+            example:
+              email: alice@test.com
+              password: Password123
       responses:
         "200":
-          description: Login successful
+          description: Login success
+          content:
+            application/json:
+              example:
+                token: jwt_token_here
+                user:
+                  id: 1
+                  email: alice@test.com
         "401":
-          description: Invalid credentials
+          description: Unauthorized
 
-  # ================= TRIPS =================
+# ================= TRIPS =================
 
   /api/trips:
     post:
@@ -147,35 +124,35 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              required: [title, startDate, endDate, budget]
-              properties:
-                title:
-                  type: string
-                  example: Goa Trip
-                startDate:
-                  type: string
-                  format: date
-                  example: 2026-06-01
-                endDate:
-                  type: string
-                  format: date
-                  example: 2026-06-10
-                budget:
-                  type: number
-                  example: 2000
+            example:
+              title: Europe Trip
+              startDate: 2026-07-01
+              endDate: 2026-07-10
+              budget: 5000
       responses:
         "201":
           description: Trip created
+          content:
+            application/json:
+              example:
+                id: 1
+                title: Europe Trip
+                budget: 5000
+        "400":
+          description: Bad Request
         "401":
           description: Unauthorized
 
     get:
-      summary: Get all trips (user scoped)
+      summary: Get all trips
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              example:
+                - id: 1
+                  title: Europe Trip
         "401":
           description: Unauthorized
 
@@ -186,15 +163,13 @@ paths:
         - name: id
           in: path
           required: true
-          schema:
-            type: integer
       responses:
         "200":
           description: Success
         "403":
           description: Forbidden
         "404":
-          description: Not found
+          description: Not Found
 
     put:
       summary: Update trip
@@ -206,24 +181,16 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                startDate:
-                  type: string
-                  format: date
-                endDate:
-                  type: string
-                  format: date
-                budget:
-                  type: number
+            example:
+              title: Updated Trip
+              budget: 9999
       responses:
         "200":
           description: Updated
         "403":
           description: Forbidden
+        "404":
+          description: Not Found
 
     delete:
       summary: Delete trip
@@ -232,12 +199,14 @@ paths:
           in: path
           required: true
       responses:
-        "200":
-          description: Deleted
+        "204":
+          description: No Content
         "403":
           description: Forbidden
+        "404":
+          description: Not Found
 
-  # ================= DESTINATIONS =================
+# ================= DESTINATIONS =================
 
   /api/destinations:
     post:
@@ -246,26 +215,11 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              required: [city, country, visitDate, tripId]
-              properties:
-                city:
-                  type: string
-                  example: Goa
-                country:
-                  type: string
-                  example: India
-                visitDate:
-                  type: string
-                  format: date
-                  example: 2026-06-02
-                notes:
-                  type: string
-                  example: Beach trip
-                tripId:
-                  type: integer
-                  example: 1
+            example:
+              city: Paris
+              country: France
+              visitDate: 2026-07-01
+              tripId: 1
       responses:
         "201":
           description: Created
@@ -279,48 +233,39 @@ paths:
       responses:
         "200":
           description: Success
+          content:
+            application/json:
+              example:
+                - id: 1
+                  city: Paris
         "401":
           description: Unauthorized
 
   /api/destinations/{id}:
     get:
-      summary: Get destination by ID
+      summary: Get destination
       parameters:
         - name: id
           in: path
-          required: true
-          schema:
-            type: integer
       responses:
         "200":
           description: Success
         "403":
           description: Forbidden
         "404":
-          description: Not found
+          description: Not Found
 
     put:
       summary: Update destination
       parameters:
         - name: id
           in: path
-          required: true
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              properties:
-                city:
-                  type: string
-                country:
-                  type: string
-                visitDate:
-                  type: string
-                  format: date
-                notes:
-                  type: string
+            example:
+              city: London
       responses:
         "200":
           description: Updated
@@ -330,12 +275,15 @@ paths:
       parameters:
         - name: id
           in: path
-          required: true
       responses:
-        "200":
-          description: Deleted
+        "204":
+          description: No Content
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
 
-  # ================= ACTIVITIES =================
+# ================= ACTIVITIES =================
 
   /api/activities:
     post:
@@ -344,84 +292,41 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              required: [name, activityDate, activityTime, estimatedCost, destinationId]
-              properties:
-                name:
-                  type: string
-                  example: Beach Walk
-                description:
-                  type: string
-                  example: Morning walk
-                activityDate:
-                  type: string
-                  format: date
-                  example: 2026-06-03
-                activityTime:
-                  type: string
-                  example: "09:00"
-                estimatedCost:
-                  type: number
-                  example: 100
-                destinationId:
-                  type: integer
-                  example: 1
+            example:
+              name: Eiffel Visit
+              activityDate: 2026-07-01
+              activityTime: "10:00"
+              estimatedCost: 100
+              destinationId: 1
       responses:
         "201":
           description: Created
         "401":
           description: Unauthorized
-        "403":
-          description: Forbidden
 
     get:
       summary: Get all activities
       responses:
         "200":
           description: Success
-        "401":
-          description: Unauthorized
 
   /api/activities/{id}:
     get:
-      summary: Get activity by ID
+      summary: Get activity
       parameters:
         - name: id
           in: path
-          required: true
       responses:
         "200":
           description: Success
-        "403":
-          description: Forbidden
         "404":
-          description: Not found
+          description: Not Found
 
     put:
       summary: Update activity
       parameters:
         - name: id
           in: path
-          required: true
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                description:
-                  type: string
-                activityDate:
-                  type: string
-                  format: date
-                activityTime:
-                  type: string
-                estimatedCost:
-                  type: number
       responses:
         "200":
           description: Updated
@@ -431,7 +336,8 @@ paths:
       parameters:
         - name: id
           in: path
-          required: true
       responses:
-        "200":
-          description: Deleted
+        "204":
+          description: No Content
+        "404":
+          description: Not Found

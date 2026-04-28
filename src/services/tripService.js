@@ -141,7 +141,9 @@ export const deleteTrip = async (id, userId) => {
     throw new AppError("Forbidden", 403);
   }
 
-  return prisma.trip.delete({
+  await prisma.trip.delete({
     where: { id: tripId },
   });
+
+  // ❌ no return
 };
