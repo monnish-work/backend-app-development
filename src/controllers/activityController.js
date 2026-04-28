@@ -64,7 +64,8 @@ export const deleteActivity = async (req, res, next) => {
       req.user.userId
     );
 
-    res.json({ message: "Deleted successfully" });
+    // 204 = No Content (no body allowed)
+    return res.status(204).send();
   } catch (err) {
     next(err);
   }

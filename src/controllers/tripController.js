@@ -57,7 +57,9 @@ export const deleteTrip = async (req, res, next) => {
       req.params.id,
       req.user.userId
     );
-    res.json({ message: "Trip deleted" });
+
+    // 204 = No content (no response body allowed)
+    return res.status(204).send();
   } catch (err) {
     next(err);
   }
