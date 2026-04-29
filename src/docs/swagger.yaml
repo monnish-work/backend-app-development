@@ -8,6 +8,7 @@ info:
 servers:
   - url: https://travel-planner-api-1pcn.onrender.com
 
+# ================= COMPONENTS =================
 components:
   securitySchemes:
     bearerAuth:
@@ -15,53 +16,94 @@ components:
       scheme: bearer
       bearerFormat: JWT
 
-security:
-  - bearerAuth: []
-
-# ================= SCHEMAS =================
-components:
   schemas:
     User:
       type: object
       properties:
-        id: { type: integer }
-        name: { type: string }
-        email: { type: string }
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
 
     Trip:
       type: object
+      required:
+        - title
+        - startDate
+        - endDate
+        - budget
       properties:
-        id: { type: integer }
-        title: { type: string }
-        startDate: { type: string, format: date }
-        endDate: { type: string, format: date }
-        budget: { type: number }
-        userId: { type: integer }
+        id:
+          type: integer
+        title:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        budget:
+          type: number
+        userId:
+          type: integer
 
     Destination:
       type: object
+      required:
+        - city
+        - country
+        - visitDate
+        - tripId
       properties:
-        id: { type: integer }
-        city: { type: string }
-        country: { type: string }
-        visitDate: { type: string, format: date }
-        notes: { type: string }
-        tripId: { type: integer }
+        id:
+          type: integer
+        city:
+          type: string
+        country:
+          type: string
+        visitDate:
+          type: string
+          format: date
+        notes:
+          type: string
+        tripId:
+          type: integer
 
     Activity:
       type: object
+      required:
+        - name
+        - activityDate
+        - activityTime
+        - estimatedCost
+        - destinationId
       properties:
-        id: { type: integer }
-        name: { type: string }
-        description: { type: string }
-        activityDate: { type: string, format: date }
-        activityTime: { type: string }
-        estimatedCost: { type: number }
-        destinationId: { type: integer }
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        activityDate:
+          type: string
+          format: date
+        activityTime:
+          type: string
+        estimatedCost:
+          type: number
+        destinationId:
+          type: integer
+
+security:
+  - bearerAuth: []
+
+# ================= PATHS =================
+paths:
 
 # ================= AUTH =================
-
-paths:
 
   /api/auth/signup:
     post:
@@ -71,25 +113,23 @@ paths:
         required: true
         content:
           application/json:
-            example:
-              name: Alice
-              email: alice@test.com
-              password: Password123
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
       responses:
         "201":
           description: User created
         "400":
-          description: Bad Request
-          content:
-            application/json:
-              example:
-                message: Invalid input
+          description: Invalid input
         "409":
-          description: Conflict
-          content:
-            application/json:
-              example:
-                message: User already exists
+          description: User already exists
 
   /api/auth/login:
     post:
@@ -99,21 +139,19 @@ paths:
         required: true
         content:
           application/json:
-            example:
-              email: alice@test.com
-              password: Password123
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
       responses:
         "200":
           description: Login success
-          content:
-            application/json:
-              example:
-                token: jwt_token_here
-                user:
-                  id: 1
-                  email: alice@test.com
-        "401":
-          description: Unauthorized
+        "400":
+          description: Invalid credentials
 
 # ================= TRIPS =================
 
@@ -124,20 +162,11 @@ paths:
         required: true
         content:
           application/json:
-            example:
-              title: Europe Trip
-              startDate: 2026-07-01
-              endDate: 2026-07-10
-              budget: 5000
+            schema:
+              $ref: '#/components/schemas/Trip'
       responses:
         "201":
           description: Trip created
-          content:
-            application/json:
-              example:
-                id: 1
-                title: Europe Trip
-                budget: 5000
         "400":
           description: Bad Request
         "401":
@@ -148,21 +177,18 @@ paths:
       responses:
         "200":
           description: Success
-          content:
-            application/json:
-              example:
-                - id: 1
-                  title: Europe Trip
         "401":
           description: Unauthorized
 
   /api/trips/{id}:
     get:
-      summary: Get trip by ID
+      summary: Get trip by id
       parameters:
         - name: id
           in: path
           required: true
+          schema:
+            type: integer
       responses:
         "200":
           description: Success
@@ -177,13 +203,25 @@ paths:
         - name: id
           in: path
           required: true
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
           application/json:
-            example:
-              title: Updated Trip
-              budget: 9999
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+                budget:
+                  type: number
       responses:
         "200":
           description: Updated
@@ -198,6 +236,8 @@ paths:
         - name: id
           in: path
           required: true
+          schema:
+            type: integer
       responses:
         "204":
           description: No Content
@@ -215,11 +255,8 @@ paths:
         required: true
         content:
           application/json:
-            example:
-              city: Paris
-              country: France
-              visitDate: 2026-07-01
-              tripId: 1
+            schema:
+              $ref: '#/components/schemas/Destination'
       responses:
         "201":
           description: Created
@@ -233,11 +270,6 @@ paths:
       responses:
         "200":
           description: Success
-          content:
-            application/json:
-              example:
-                - id: 1
-                  city: Paris
         "401":
           description: Unauthorized
 
@@ -247,6 +279,9 @@ paths:
       parameters:
         - name: id
           in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "200":
           description: Success
@@ -260,12 +295,25 @@ paths:
       parameters:
         - name: id
           in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
           application/json:
-            example:
-              city: London
+            schema:
+              type: object
+              properties:
+                city:
+                  type: string
+                country:
+                  type: string
+                visitDate:
+                  type: string
+                  format: date
+                notes:
+                  type: string
       responses:
         "200":
           description: Updated
@@ -275,6 +323,9 @@ paths:
       parameters:
         - name: id
           in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "204":
           description: No Content
@@ -292,12 +343,8 @@ paths:
         required: true
         content:
           application/json:
-            example:
-              name: Eiffel Visit
-              activityDate: 2026-07-01
-              activityTime: "10:00"
-              estimatedCost: 100
-              destinationId: 1
+            schema:
+              $ref: '#/components/schemas/Activity'
       responses:
         "201":
           description: Created
@@ -316,6 +363,9 @@ paths:
       parameters:
         - name: id
           in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "200":
           description: Success
@@ -327,6 +377,27 @@ paths:
       parameters:
         - name: id
           in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                activityDate:
+                  type: string
+                  format: date
+                activityTime:
+                  type: string
+                estimatedCost:
+                  type: number
       responses:
         "200":
           description: Updated
@@ -336,6 +407,9 @@ paths:
       parameters:
         - name: id
           in: path
+          required: true
+          schema:
+            type: integer
       responses:
         "204":
           description: No Content
